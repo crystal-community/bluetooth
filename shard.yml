@@ -1,0 +1,9 @@
+name: bluetooth
+version: 0.1.0
+
+authors:
+  - Bar Hofesh <bar.hofesh@gmail.com>
+
+crystal: 0.24.1
+
+license: MIT
