@@ -8,7 +8,6 @@ lib LibC
   # struct Sockaddr
   #   sa_family : SaFamilyT
   #   sa_data : StaticArray(Char, 14)
-  #   size : Int32
   # end
 
   struct SockaddrBT
