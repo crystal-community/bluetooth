@@ -160,7 +160,7 @@ lib LibHCI
   fun send_req = hci_send_req(dd : LibC::Int, req : Request*, timeout : LibC::Int) : LibC::Int
   fun create_connection = hci_create_connection(dd : LibC::Int, bdaddr : LibC::Int*, ptype : LibC::Int, clkoffset : LibC::Int, rswitch : LibC::Int, handle : LibC::Int*, to : LibC::Int) : LibC::Int
   fun disconnect = hci_disconnect(dd : LibC::Int, handle : LibC::Int, reason : LibC::Int, to : LibC::Int) : LibC::Int
-  fun inquiry = hci_inquiry(dev_id : LibC::Int, len : LibC::Int, num_rsp : LibC::Int, lap : LibC::Int*, ii : InquiryInfo*, flags : LibC::Long) : LibC::Int
+  fun inquiry = hci_inquiry(dev_id : LibC::Int, len : LibC::Int, num_rsp : LibC::Int, lap : LibC::Int*, ii : InquiryInfo**, flags : LibC::Long) : LibC::Int
   fun devinfo = hci_devinfo(dev_id : LibC::Int, di : Void*) : LibC::Int
   fun devba = hci_devba(dev_id : LibC::Int, bdaddr : LibC::Int*) : LibC::Int
   fun devid = hci_devid(str : LibC::Char*) : LibC::Int

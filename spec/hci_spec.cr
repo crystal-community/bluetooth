@@ -54,16 +54,25 @@ describe Bluetooth do
     puts "Using dev: #{dev}"
     socket = LibHCI.open_dev(dev)
     puts "FD: #{socket}"
-    len = 8
-    max_rsp = 1
+    len = 10
+    max_rsp = 5
     flags = LibHCI::IREQ_CACHE_FLUSH
-    inq_info = LibHCI::InquiryInfo.new
-    scan_response = LibHCI.inquiry(dev, len, max_rsp, nil, pointerof(inq_info), flags) == 0 ? "success" : "failed"
-    puts "Scan status: #{scan_response}"
-    address = inq_info.bdaddr
-    str = String.new
-    puts "Addr: #{LibHCI.ba2str(pointerof(address), str)}"
-    puts "Addr String: #{str}"
+    inq_info_array = Array(LibHCI::InquiryInfo).new
+    max_rsp.times do
+      inq_info_array << LibHCI::InquiryInfo.new
+    end
+    inq_info_array_ptr = inq_info_array.to_unsafe
+    num_of_devices = LibHCI.inquiry(dev, len, max_rsp, nil, pointerof(inq_info_array_ptr), flags)
+    puts "found #{num_of_devices} devices near by"
+    if num_of_devices > 0
+      num_of_devices.times do |index|
+        inq_info = inq_info_array[index]
+        address = inq_info.bdaddr
+        str = String.new
+        puts "Addr: #{LibHCI.batostr(pointerof(address)).value}"
+        puts "Addr String: #{str}"
+      end
+    end
     LibHCI.close_dev(socket)
   end
 end
