@@ -166,7 +166,7 @@ lib LibHCI
   fun devid = hci_devid(str : LibC::Char*) : LibC::Int
   fun read_local_name = hci_read_local_name(dd : LibC::Int, len : LibC::Int, name : LibC::Char*, to : LibC::Int) : LibC::Int
   fun write_local_name = hci_write_local_name(dd : LibC::Int, name : LibC::Char*, to : LibC::Int) : LibC::Int
-  fun read_remote_name = hci_read_remote_name(dd : LibC::Int, bdaddr : LibC::Int*, len : LibC::Int, name : LibC::Char*, to : LibC::Int) : LibC::Int
+  fun read_remote_name = hci_read_remote_name(dd : LibC::Int, bdaddr : BdaddrT*, len : LibC::Int, name : LibC::Char*, to : LibC::Int) : LibC::Int
   fun read_remote_name_with_clock_offset = hci_read_remote_name_with_clock_offset(dd : LibC::Int, bdaddr : LibC::Int*, pscan_rep_mode : LibC::Int, clkoffset : LibC::Int, len : LibC::Int, name : LibC::Char*, to : LibC::Int) : LibC::Int
   fun read_remote_name_cancel = hci_read_remote_name_cancel(dd : LibC::Int, bdaddr : LibC::Int*, to : LibC::Int) : LibC::Int
   fun read_remote_version = hci_read_remote_version(dd : LibC::Int, handle : LibC::Int, ver : Version*, to : LibC::Int) : LibC::Int

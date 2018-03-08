@@ -42,8 +42,7 @@ require "./spec_helper"
 
 describe Bluetooth do
   it "Initialize a new socket" do
-    a = 0
-    dev = LibHCI.get_route(pointerof(a)) # ugly hack
+    dev = LibHCI.get_route(nil)
     socket = LibHCI.open_dev(dev)
     LibHCI.close_dev(socket)
     (socket > -1).should eq(true)
@@ -68,9 +67,15 @@ describe Bluetooth do
       num_of_devices.times do |index|
         inq_info = inq_info_array[index]
         address = inq_info.bdaddr
-        str = String.new
-        puts "Addr: #{LibHCI.batostr(pointerof(address)).value}"
-        puts "Addr String: #{str}"
+
+        name_slice = Slice(UInt8).new(248, 0_u8)
+        address_slice = Slice(UInt8).new(19, 0_u8)
+
+        remote_addr_pointer = LibHCI.ba2str(pointerof(address), address_slice.to_unsafe)
+        remote_name = LibHCI.read_remote_name(socket, pointerof(address), 248, name_slice.to_unsafe, 0)
+
+        puts "Name: #{String.new(name_slice)}"
+        puts "Addr: #{String.new(address_slice)}"
       end
     end
     LibHCI.close_dev(socket)
