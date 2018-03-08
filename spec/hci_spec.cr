@@ -1,45 +1,5 @@
 require "./spec_helper"
 
-# C Example for scanning
-
-# int main(int argc, char **argv)
-# {
-#     inquiry_info *ii = NULL;
-#     int max_rsp, num_rsp;
-#     int dev_id, sock, len, flags;
-#     int i;
-#     char addr[19] = { 0 };
-#     char name[248] = { 0 };
-
-#     dev_id = hci_get_route(NULL);
-#     sock = hci_open_dev( dev_id );
-#     if (dev_id < 0 || sock < 0) {
-#         perror("opening socket");
-#         exit(1);
-#     }
-
-#     len  = 8;
-#     max_rsp = 255;
-#     flags = IREQ_CACHE_FLUSH;
-#     ii = (inquiry_info*)malloc(max_rsp * sizeof(inquiry_info));
-
-#     num_rsp = hci_inquiry(dev_id, len, max_rsp, NULL, &ii, flags);
-#     if( num_rsp < 0 ) perror("hci_inquiry");
-
-#     for (i = 0; i < num_rsp; i++) {
-#         ba2str(&(ii+i)->bdaddr, addr);
-#         memset(name, 0, sizeof(name));
-#         if (hci_read_remote_name(sock, &(ii+i)->bdaddr, sizeof(name),
-#             name, 0) < 0)
-#         strcpy(name, "[unknown]");
-#         printf("%s  %s\n", addr, name);
-#     }
-
-#     free( ii );
-#     close( sock );
-#     return 0;
-# }
-
 describe Bluetooth do
   it "Initialize a new socket" do
     dev = LibHCI.get_route(nil)
@@ -53,6 +13,87 @@ describe Bluetooth do
     puts "Using dev: #{dev}"
     socket = LibHCI.open_dev(dev)
     puts "FD: #{socket}"
+    len = 10
+    max_rsp = 5
+    flags = LibHCI::IREQ_CACHE_FLUSH
+    inq_info_array = Array(LibHCI::InquiryInfo).new
+    max_rsp.times do
+      inq_info_array << LibHCI::InquiryInfo.new
+    end
+    inq_info_array_ptr = inq_info_array.to_unsafe
+    num_of_devices = LibHCI.inquiry(dev, len, max_rsp, nil, pointerof(inq_info_array_ptr), flags)
+    puts "found #{num_of_devices} devices near by"
+    if num_of_devices > 0
+      num_of_devices.times do |index|
+        inq_info = inq_info_array[index]
+        address = inq_info.bdaddr
+
+        name_slice = Slice(UInt8).new(248, 0_u8)
+        address_slice = Slice(UInt8).new(19, 0_u8)
+
+        remote_addr_pointer = LibHCI.ba2str(pointerof(address), address_slice.to_unsafe)
+        remote_name = LibHCI.read_remote_name(socket, pointerof(address), 248, name_slice.to_unsafe, 0)
+
+        puts "Name: #{String.new(name_slice)}"
+        puts "Addr: #{String.new(address_slice)}"
+      end
+    end
+    LibHCI.close_dev(socket)
+  end
+
+  # void start_hci_scan(struct hci_state current_hci_state)
+  # {
+  #   if(hci_le_set_scan_parameters(current_hci_state.device_handle, 0x01, htobs(0x0010), htobs(0x0010), 0x00, 0x00, 1000) < 0)
+  #   {
+  #     current_hci_state.has_error = TRUE;
+  #     snprintf(current_hci_state.error_message, sizeof(current_hci_state.error_message), "Failed to set scan parameters: %s", strerror(errno));
+  #     return;
+  #   }
+
+  #   if(hci_le_set_scan_enable(current_hci_state.device_handle, 0x01, 1, 1000) < 0)
+  #   {
+  #     current_hci_state.has_error = TRUE;
+  #     snprintf(current_hci_state.error_message, sizeof(current_hci_state.error_message), "Failed to enable scan: %s", strerror(errno));
+  #     return;
+  #   }
+
+  #   current_hci_state.state = HCI_STATE_SCANNING;
+
+  #   // Save the current HCI filter
+  #   socklen_t olen = sizeof(current_hci_state.original_filter);
+  #   if(getsockopt(current_hci_state.device_handle, SOL_HCI, HCI_FILTER, &current_hci_state.original_filter, &olen) < 0)
+  #   {
+  #     current_hci_state.has_error = TRUE;
+  #     snprintf(current_hci_state.error_message, sizeof(current_hci_state.error_message), "Could not get socket options: %s", strerror(errno));
+  #     return;
+  #   }
+
+  #   // Create and set the new filter
+  #   struct hci_filter new_filter;
+
+  #   hci_filter_clear(&new_filter);
+  #   hci_filter_set_ptype(HCI_EVENT_PKT, &new_filter);
+  #   hci_filter_set_event(EVT_LE_META_EVENT, &new_filter);
+
+  #   if(setsockopt(current_hci_state.device_handle, SOL_HCI, HCI_FILTER, &new_filter, sizeof(new_filter)) < 0)
+  #   {
+  #     current_hci_state.has_error = TRUE;
+  #     snprintf(current_hci_state.error_message, sizeof(current_hci_state.error_message), "Could not set socket options: %s", strerror(errno));
+  #     return;
+  #   }
+
+  #   current_hci_state.state = HCI_STATE_FILTERING;
+  # }
+  it "scnas for BLE devices" do
+    dev = LibHCI.get_route(nil)
+    puts "Using dev: #{dev}"
+    socket = LibHCI.open_dev(dev)
+    puts "FD: #{socket}"
+
+    # Change to BLE mode
+    LibHCI.le_set_scan_parameters(dev, 0x01, Bluetooth.bswap(0x0010), Bluetooth.bswap(0x0010), 0x00, 0x00, 1000)
+    LibHCI.le_set_scan_enable(dev, 0x01, 1, 1000)
+
     len = 10
     max_rsp = 5
     flags = LibHCI::IREQ_CACHE_FLUSH

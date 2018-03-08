@@ -2,5 +2,7 @@ require "./bluetooth/**"
 
 # TODO: Write documentation for `Bluetooth`
 module Bluetooth
-  # TODO: Put your code here
+  def self.bswap(int : Int)
+    (int >> 8) | (int << 8)
+  end
 end
