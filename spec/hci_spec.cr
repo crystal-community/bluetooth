@@ -50,8 +50,20 @@ describe Bluetooth do
   end
 
   it "scans for devices" do
-    a = 0
-    dev = LibHCI.get_route(pointerof(a)) # ugly hack
+    dev = LibHCI.get_route(nil)
+    puts "Using dev: #{dev}"
     socket = LibHCI.open_dev(dev)
+    puts "FD: #{socket}"
+    len = 8
+    max_rsp = 1
+    flags = LibHCI::IREQ_CACHE_FLUSH
+    inq_info = LibHCI::InquiryInfo.new
+    scan_response = LibHCI.inquiry(dev, len, max_rsp, nil, pointerof(inq_info), flags) == 0 ? "success" : "failed"
+    puts "Scan status: #{scan_response}"
+    address = inq_info.bdaddr
+    str = String.new
+    puts "Addr: #{LibHCI.ba2str(pointerof(address), str)}"
+    puts "Addr String: #{str}"
+    LibHCI.close_dev(socket)
   end
 end

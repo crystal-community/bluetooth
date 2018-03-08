@@ -1,23 +1,24 @@
 @[Link("bluetooth")]
 lib LibHCI
-  Connected = 1
-  Open      = 2
-  Bound     = 3
-  Listen    = 4
-  Connect   = 5
-  Connect2  = 6
-  Config    = 7
-  Disconn   = 8
-  Closed    = 9
-  Up        = 0
-  Init      = 1
-  Running   = 2
-  Pscan     = 3
-  Iscan     = 4
-  Auth      = 5
-  Encrypt   = 6
-  Inquiry   = 7
-  Raw       = 8
+  Connected        = 1
+  Open             = 2
+  Bound            = 3
+  Listen           = 4
+  Connect          = 5
+  Connect2         = 6
+  Config           = 7
+  Disconn          = 8
+  Closed           = 9
+  Up               = 0
+  Init             = 1
+  Running          = 2
+  Pscan            = 3
+  Iscan            = 4
+  Auth             = 5
+  Encrypt          = 6
+  Inquiry          = 7
+  Raw              = 8
+  IREQ_CACHE_FLUSH = 1
 
   struct Security
     level : Uint8T
@@ -108,6 +109,16 @@ lib LibHCI
     type : Uint8T
   end
 
+  @[Packed]
+  struct InquiryInfo
+    bdaddr : BdaddrT
+    pscan_rep_mode : Uint8T
+    pscan_period_mode : Uint8T
+    pscan_mode : Uint8T
+    dev_class : Uint8T[3]
+    clock_offset : Uint16T
+  end
+
   struct InquiryReq
     dev_id : Uint16T
     flags : Uint16T
@@ -149,7 +160,7 @@ lib LibHCI
   fun send_req = hci_send_req(dd : LibC::Int, req : Request*, timeout : LibC::Int) : LibC::Int
   fun create_connection = hci_create_connection(dd : LibC::Int, bdaddr : LibC::Int*, ptype : LibC::Int, clkoffset : LibC::Int, rswitch : LibC::Int, handle : LibC::Int*, to : LibC::Int) : LibC::Int
   fun disconnect = hci_disconnect(dd : LibC::Int, handle : LibC::Int, reason : LibC::Int, to : LibC::Int) : LibC::Int
-  fun inquiry = hci_inquiry(dev_id : LibC::Int, len : LibC::Int, num_rsp : LibC::Int, lap : LibC::Int*, ii : LibC::Int**, flags : LibC::Long) : LibC::Int
+  fun inquiry = hci_inquiry(dev_id : LibC::Int, len : LibC::Int, num_rsp : LibC::Int, lap : LibC::Int*, ii : InquiryInfo*, flags : LibC::Long) : LibC::Int
   fun devinfo = hci_devinfo(dev_id : LibC::Int, di : Void*) : LibC::Int
   fun devba = hci_devba(dev_id : LibC::Int, bdaddr : LibC::Int*) : LibC::Int
   fun devid = hci_devid(str : LibC::Char*) : LibC::Int
@@ -270,5 +281,12 @@ lib LibHCI
   fun malloc = bt_malloc(size : LibC::Int) : Void*
   fun free = bt_free(ptr : Void*)
   fun error = bt_error(code : Uint16T) : LibC::Int
-  fun compidtostr = bt_compidtostr(id : LibC::Int) : LibC::Char*
+  fun compidtostr = compidtostr(id : LibC::Int) : LibC::Char*
+  fun batostr = batostr(ba : BdaddrT*) : LibC::Char*
+  fun ba2str = ba2str(ba : BdaddrT*, str : LibC::Char*) : LibC::Int
+  fun str2ba = str2ba(str : LibC::Char*, ba : BdaddrT*) : LibC::Int
+  fun ba2oui = ba2oui(ba : BdaddrT*, oui : LibC::Char*) : LibC::Int
+  fun bachk = bachk(str : LibC::Char*) : LibC::Int
+  fun baprintf = baprintf(format : LibC::Char*, ...) : LibC::Int
+  # fun bafprintf = bafprintf(stream : File*, format : LibC::Char*, ...) : LibC::Int
 end
