@@ -94,6 +94,11 @@ describe Bluetooth do
     LibHCI.le_set_scan_parameters(dev, 0x01, Bluetooth.bswap(0x0010), Bluetooth.bswap(0x0010), 0x00, 0x00, 1000)
     LibHCI.le_set_scan_enable(dev, 0x01, 1, 1000)
 
+    # Set new filter
+    filter = LibHCI::Filter.new
+    LibHCI.filter_clear(pointerof(filter))
+    LibC.setsockopt(socket, LibHCI::SOL_HCI, LibHCI::)
+
     len = 10
     max_rsp = 5
     flags = LibHCI::IREQ_CACHE_FLUSH

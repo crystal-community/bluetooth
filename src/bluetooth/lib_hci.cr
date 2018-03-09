@@ -1,24 +1,29 @@
 @[Link("bluetooth")]
 lib LibHCI
-  Connected        = 1
-  Open             = 2
-  Bound            = 3
-  Listen           = 4
-  Connect          = 5
-  Connect2         = 6
-  Config           = 7
-  Disconn          = 8
-  Closed           = 9
-  Up               = 0
-  Init             = 1
-  Running          = 2
-  Pscan            = 3
-  Iscan            = 4
-  Auth             = 5
-  Encrypt          = 6
-  Inquiry          = 7
-  Raw              = 8
-  IREQ_CACHE_FLUSH = 1
+  Connected        =  1
+  Open             =  2
+  Bound            =  3
+  Listen           =  4
+  Connect          =  5
+  Connect2         =  6
+  Config           =  7
+  Disconn          =  8
+  Closed           =  9
+  Up               =  0
+  Init             =  1
+  Running          =  2
+  Pscan            =  3
+  Iscan            =  4
+  Auth             =  5
+  Encrypt          =  6
+  Inquiry          =  7
+  Raw              =  8
+  IREQ_CACHE_FLUSH =  1
+  SOL_HCI          =  0
+  SOL_L2CAP        =  6
+  SOL_SCO          = 17
+  SOL_RFCOMM       = 18
+  HCI_FILTER       = +2
 
   struct Security
     level : Uint8T
