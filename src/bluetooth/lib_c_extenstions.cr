@@ -9,6 +9,7 @@ lib LibC
   #   sa_family : SaFamilyT
   #   sa_data : StaticArray(Char, 14)
   # end
+  fun memset = memset(pointer : Void*, int : Int32, size : Int32)
 
   struct SockaddrBT
     sa_family : SaFamilyT

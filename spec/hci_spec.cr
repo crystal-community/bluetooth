@@ -96,8 +96,11 @@ describe Bluetooth do
 
     # Set new filter
     filter = LibHCI::Filter.new
-    LibHCI.filter_clear(pointerof(filter))
-    LibC.setsockopt(socket, LibHCI::SOL_HCI, LibHCI::)
+
+    LibC.memset(pointerof(filter), 0, sizeof(LibHCI::Filter))
+    Bluetooth.filter_set_ptype(LibHCI::HCI_EVENT_PKT, pointerof(filter))
+    # LibHCI.filter_set_event(LibHCI::EVT_LE_META_EVENT, pointerof(filter))
+    # LibC.setsockopt(socket, LibHCI::SOL_HCI, LibHCI::HCI_FILTER, pointerof(filter), sizeof(LibHCI::Filter))
 
     len = 10
     max_rsp = 5
