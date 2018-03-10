@@ -58,6 +58,26 @@ module Bluetooth
       respones
     end
 
+    def connect(address : String)
+      # int hci_create_connection(int dd, const bdaddr_t *bdaddr, uint16_t ptype, uint16_t clkoffset, uint8_t rswitch, uint16_t *handle, int to);
+
+      # if (hci_create_connection(current_hci_state.device_handle, bdaddr, htobs(di.pkt_type & ACL_PTYPE_MASK), 0, 0x01, &handle, 25000) < 0) {
+      #     perror("Can't create connection");
+      #     // TODO close(dd);
+      #     return(-1);
+      # }
+      # fun str2ba = str2ba(str : LibC::Char*, ba : BdaddrT*) : LibC::Int
+
+      # Turn string address to BdaddrT struct
+      bdaddr = LibHCI::BdaddrT.new
+      address_slice = address.to_slice
+      LibHCI.str2ba(address_slice.to_unsafe, pointerof(bdaddr))
+      LibHCI.create_connection(@socket, pointerof(bdaddr))
+    end
+
+    def disconnect
+    end
+
     def close
       LibHCI.close_dev(@socket)
     end

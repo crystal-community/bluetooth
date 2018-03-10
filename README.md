@@ -31,6 +31,11 @@ p remote_devices
 
 ## Development
 
+Some relevant resources:  
+* http://people.csail.mit.edu/albert/bluez-intro/c404.html  
+* https://github.com/carsonmcdonald/bluez-experiments/blob/master/experiments/scantest.c  
+* http://affix.sourceforge.net/affix-doc/x496.html  
+
 * [ ] Bluetooth  
   * [x] Scan for remote devices.  
   * [ ] Connect to remote devices.  
