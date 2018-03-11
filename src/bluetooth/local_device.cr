@@ -100,12 +100,16 @@ module Bluetooth
       #         }
       #         free(cr);
       # }
+      cr = Pointer(Void).malloc(sizeof(Void*) + sizeof(LibHCI::ConnInfo)).as(LibHCI::ConnInfoReq*)
       ci = LibHCI::ConnInfoReq.new
       ci.type = LibHCI::ACL_LINK
       ci.bdaddr = addr
-      handle = 0_u16
-      check = LibC.ioctl(@socket, LibHCI::HCIGETCONNINFO, ci.unsafe_as(LibC::ULong))
-      if check > 0
+      cr.value = ci
+      check = LibC.ioctl(@socket, LibHCI::HCIGETCONNINFO, cr)
+      puts "Check: #{check}"
+      if check < 0
+        handle = 0_u16
+      else
         puts "super handle"
         handle = Bluetooth.bswap(ci.conn_info[0].handle)
       end
