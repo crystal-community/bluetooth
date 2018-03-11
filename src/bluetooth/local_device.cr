@@ -86,32 +86,19 @@ module Bluetooth
     end
 
     private def get_conn_info_handle(addr : LibHCI::BdaddrT) : UInt16
-      #     if (extinf) {
-      #       cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
-      #       if (cr) {
-      #         bacpy(&cr->bdaddr, &(info+i)->bdaddr);
-      #         cr->type = ACL_LINK;
-      #         if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
-      #           handle = 0;
-      #           cc = 1;
-      #         } else {
-      #           handle = bswap(cr->conn_info->handle);
-      #           cc = 0;
-      #         }
-      #         free(cr);
-      # }
-      cr = Pointer(Void).malloc(sizeof(Void*) + sizeof(LibHCI::ConnInfo)).as(LibHCI::ConnInfoReq*)
-      ci = LibHCI::ConnInfoReq.new
-      ci.type = LibHCI::ACL_LINK
-      ci.bdaddr = addr
-      cr.value = ci
-      check = LibC.ioctl(@socket, LibHCI::HCIGETCONNINFO, cr)
+      pair = LibHCI::HCIGetConnInfoPair.new
+      pair.request.type = LibHCI::ACL_LINK
+      pair.request.bdaddr = addr
+      check = LibC.ioctl(@socket, LibHCI::HCIGETCONNINFO, pointerof(pair))
       puts "Check: #{check}"
+      puts "#{pair.response}"
+      puts "#{pair.request}"
       if check < 0
+        puts "Error: #{Errno.new("")}"
         handle = 0_u16
       else
         puts "super handle"
-        handle = Bluetooth.bswap(ci.conn_info[0].handle)
+        handle = Bluetooth.bswap(pair.response.handle)
       end
       handle
     end

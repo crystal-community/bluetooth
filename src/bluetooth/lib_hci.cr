@@ -134,6 +134,18 @@ lib LibHCI
     link_mode : Uint32T
   end
 
+  struct ConnInfoReq
+    bdaddr : BdaddrT
+    type : Uint8T
+    conn_info : ConnInfo[0]
+  end
+
+  @[Packed]
+  struct HCIGetConnInfoPair
+    request : ConnInfoReq
+    response : ConnInfo
+  end
+
   struct DevReq
     dev_id : Uint16T
     dev_opt : Uint32T
@@ -147,12 +159,6 @@ lib LibHCI
   struct ConnListReq
     dev_id : Uint16T
     conn_num : Uint16T
-    conn_info : ConnInfo[0]
-  end
-
-  struct ConnInfoReq
-    bdaddr : BdaddrT
-    type : Uint8T
     conn_info : ConnInfo[0]
   end
 
