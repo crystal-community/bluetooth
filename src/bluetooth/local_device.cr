@@ -8,7 +8,7 @@ module Bluetooth
       raise DeviceException.new("Error binding to local device") if @dev_id < 0 || @socket < 0
     end
 
-    def scan(scan_time : Int32 = 0, max_results : Int32 = 254) : Hash(String, String)
+    def scan(scan_time : Int32 = 8, max_results : Int32 = 254) : Hash(String, String)
       respones = Hash(String, String).new
       inq_info_array = Array(LibHCI::InquiryInfo).new
       max_results.times do
@@ -59,27 +59,31 @@ module Bluetooth
     end
 
     def connect(address : String)
-      # int hci_create_connection(int dd, const bdaddr_t *bdaddr, uint16_t ptype, uint16_t clkoffset, uint8_t rswitch, uint16_t *handle, int to);
-
-      # if (hci_create_connection(current_hci_state.device_handle, bdaddr, htobs(di.pkt_type & ACL_PTYPE_MASK), 0, 0x01, &handle, 25000) < 0) {
-      #     perror("Can't create connection");
-      #     // TODO close(dd);
-      #     return(-1);
-      # }
-      # fun str2ba = str2ba(str : LibC::Char*, ba : BdaddrT*) : LibC::Int
-
-      # Turn string address to BdaddrT struct
       bdaddr = LibHCI::BdaddrT.new
       address_slice = address.to_slice
       LibHCI.str2ba(address_slice.to_unsafe, pointerof(bdaddr))
-      LibHCI.create_connection(@socket, pointerof(bdaddr))
+      dev_info = get_dev_info
+      handle = 0_u16
+      resp = LibHCI.create_connection(@socket, pointerof(bdaddr), Bluetooth.bswap(dev_info.pkt_type & LibHCI::ACL_PTYPE_MASK), 0, 0x01, pointerof(handle), 25000)
+      raise DeviceException.new("Error connecting to device: #{address}") unless resp == 0
     end
 
     def disconnect
+      #   fun disconnect = hci_disconnect(dd : LibC::Int, handle : LibC::Int, reason : LibC::Int, to : LibC::Int) : LibC::Int
+      handle = 0_u16
+      resp = LibHCI.disconnect(@socket, handle, 0, 25000)
+      raise DeviceException.new("Error disconnecting from remote device")
     end
 
     def close
       LibHCI.close_dev(@socket)
+    end
+
+    private def get_dev_info : LibHCI::DevInfo
+      dev_info = LibHCI::DevInfo.new
+      resp = LibHCI.devinfo(@dev_id, pointerof(dev_info))
+      raise DeviceException.new("Error getting device info") unless resp == 0
+      dev_info
     end
   end
 end

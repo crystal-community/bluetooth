@@ -24,7 +24,6 @@ lib LibHCI
   SOL_SCO            =   17
   SOL_RFCOMM         =   18
   HCI_FILTER         =    2
-  HCI_EVENT_PKT      = 0x04
   EVT_LE_META_EVENT  = 0x3E
   HCI_COMMAND_PKT    = 0x01
   HCI_ACLDATA_PKT    = 0x02
@@ -35,6 +34,35 @@ lib LibHCI
   HCI_FLT_EVENT_BITS =   63
   HCI_FLT_OGF_BITS   =   63
   HCI_FLT_OCF_BITS   =  127
+
+  # HCI Packet types
+  HCI_2DH1 = 0x0002
+  HCI_3DH1 = 0x0004
+  HCI_DM1  = 0x0008
+  HCI_DH1  = 0x0010
+  HCI_2DH3 = 0x0100
+  HCI_3DH3 = 0x0200
+  HCI_DM3  = 0x0400
+  HCI_DH3  = 0x0800
+  HCI_2DH5 = 0x1000
+  HCI_3DH5 = 0x2000
+  HCI_DM5  = 0x4000
+  HCI_DH5  = 0x8000
+
+  HCI_HV1 = 0x0020
+  HCI_HV2 = 0x0040
+  HCI_HV3 = 0x0080
+
+  HCI_EV3  = 0x0008
+  HCI_EV4  = 0x0010
+  HCI_EV5  = 0x0020
+  HCI_2EV3 = 0x0040
+  HCI_3EV3 = 0x0080
+  HCI_2EV5 = 0x0100
+  HCI_3EV5 = 0x0200
+
+  SCO_PTYPE_MASK = HCI_HV1 | HCI_HV2 | HCI_HV3
+  ACL_PTYPE_MASK = HCI_DM1 | HCI_DH1 | HCI_DM3 | HCI_DH3 | HCI_DM5 | HCI_DH5
 
   struct Security
     level : Uint8T
@@ -174,10 +202,10 @@ lib LibHCI
   fun close_dev = hci_close_dev(dd : LibC::Int) : LibC::Int
   fun send_cmd = hci_send_cmd(dd : LibC::Int, ogf : LibC::Int, ocf : LibC::Int, plen : LibC::Int, param : Void*) : LibC::Int
   fun send_req = hci_send_req(dd : LibC::Int, req : Request*, timeout : LibC::Int) : LibC::Int
-  fun create_connection = hci_create_connection(dd : LibC::Int, bdaddr : LibC::Int*, ptype : LibC::Int, clkoffset : LibC::Int, rswitch : LibC::Int, handle : LibC::Int*, to : LibC::Int) : LibC::Int
+  fun create_connection = hci_create_connection(dd : LibC::Int, bdaddr : BdaddrT*, ptype : LibC::Int, clkoffset : LibC::Int, rswitch : LibC::Int, handle : LibC::UInt16T*, to : LibC::Int) : LibC::Int
   fun disconnect = hci_disconnect(dd : LibC::Int, handle : LibC::Int, reason : LibC::Int, to : LibC::Int) : LibC::Int
   fun inquiry = hci_inquiry(dev_id : LibC::Int, len : LibC::Int, num_rsp : LibC::Int, lap : LibC::Int*, ii : InquiryInfo**, flags : LibC::Long) : LibC::Int
-  fun devinfo = hci_devinfo(dev_id : LibC::Int, di : Void*) : LibC::Int
+  fun devinfo = hci_devinfo(dev_id : LibC::Int, di : DevInfo*) : LibC::Int
   fun devba = hci_devba(dev_id : LibC::Int, bdaddr : LibC::Int*) : LibC::Int
   fun devid = hci_devid(str : LibC::Char*) : LibC::Int
   fun read_local_name = hci_read_local_name(dd : LibC::Int, len : LibC::Int, name : LibC::Char*, to : LibC::Int) : LibC::Int
