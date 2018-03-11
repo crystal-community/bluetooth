@@ -95,18 +95,19 @@ module Bluetooth
       #           handle = 0;
       #           cc = 1;
       #         } else {
-      #           handle = htobs(cr->conn_info->handle);
+      #           handle = bswap(cr->conn_info->handle);
       #           cc = 0;
       #         }
       #         free(cr);
       # }
-      ci = LibHCI::ConnInfo.new
+      ci = LibHCI::ConnInfoReq.new
       ci.type = LibHCI::ACL_LINK
       ci.bdaddr = addr
       handle = 0_u16
-      check = LibC.ioctl(@socket, LibHCI::HCIGETCONNINFO, ci)
+      check = LibC.ioctl(@socket, LibHCI::HCIGETCONNINFO, ci.unsafe_as(LibC::ULong))
       if check > 0
-        handle = ci.handle
+        puts "super handle"
+        handle = Bluetooth.bswap(ci.conn_info[0].handle)
       end
       handle
     end

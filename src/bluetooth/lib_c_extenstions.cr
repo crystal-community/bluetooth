@@ -10,7 +10,7 @@ lib LibC
   #   sa_data : StaticArray(Char, 14)
   # end
   fun memset = memset(pointer : Void*, int : Int32, size : Int32)
-  fun ioctl = ioctl(fd : Int32, request : UInt32, arg : UInt32) : Int32
+  fun ioctl = ioctl(fd : Int32, request : UInt32, arg : UInt64) : Int32
 
   struct SockaddrBT
     sa_family : SaFamilyT
