@@ -63,13 +63,12 @@ module Bluetooth
       address_slice = address.to_slice
       LibHCI.str2ba(address_slice.to_unsafe, pointerof(bdaddr))
       dev_info = get_dev_info
-      handle = 0_u16
+      handle = get_conn_info_handle(bdaddr)
       resp = LibHCI.create_connection(@socket, pointerof(bdaddr), Bluetooth.bswap(dev_info.pkt_type & LibHCI::ACL_PTYPE_MASK), 0, 0x01, pointerof(handle), 25000)
       raise DeviceException.new("Error connecting to device: #{address}") unless resp == 0
     end
 
     def disconnect
-      #   fun disconnect = hci_disconnect(dd : LibC::Int, handle : LibC::Int, reason : LibC::Int, to : LibC::Int) : LibC::Int
       handle = 0_u16
       resp = LibHCI.disconnect(@socket, handle, 0, 25000)
       raise DeviceException.new("Error disconnecting from remote device")
@@ -84,6 +83,32 @@ module Bluetooth
       resp = LibHCI.devinfo(@dev_id, pointerof(dev_info))
       raise DeviceException.new("Error getting device info") unless resp == 0
       dev_info
+    end
+
+    private def get_conn_info_handle(addr : LibHCI::BdaddrT) : UInt16
+      #     if (extinf) {
+      #       cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+      #       if (cr) {
+      #         bacpy(&cr->bdaddr, &(info+i)->bdaddr);
+      #         cr->type = ACL_LINK;
+      #         if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+      #           handle = 0;
+      #           cc = 1;
+      #         } else {
+      #           handle = htobs(cr->conn_info->handle);
+      #           cc = 0;
+      #         }
+      #         free(cr);
+      # }
+      ci = LibHCI::ConnInfo.new
+      ci.type = LibHCI::ACL_LINK
+      ci.bdaddr = addr
+      handle = 0_u16
+      check = LibC.ioctl(@socket, LibHCI::HCIGETCONNINFO, ci)
+      if check > 0
+        handle = ci.handle
+      end
+      handle
     end
   end
 end

@@ -64,6 +64,14 @@ lib LibHCI
   SCO_PTYPE_MASK = HCI_HV1 | HCI_HV2 | HCI_HV3
   ACL_PTYPE_MASK = HCI_DM1 | HCI_DH1 | HCI_DM3 | HCI_DH3 | HCI_DM5 | HCI_DH5
 
+  # Baseband links
+  SCO_LINK  = 0x00
+  ACL_LINK  = 0x01
+  ESCO_LINK = 0x02
+
+  # TODO make sure this makes sense
+  HCIGETCONNINFO = -2147202860.to_u32
+
   struct Security
     level : Uint8T
     key_size : Uint8T
