@@ -9,7 +9,7 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   bluetooth:
-    github: bararchy/bluetooth
+    github: crystal-community/bluetooth
 ```
 
 ## Usage
@@ -49,7 +49,7 @@ Some relevant resources:
 
 ## Contributing
 
-1. Fork it ( https://github.com/bararchy/bluetooth/fork )
+1. Fork it ( https://github.com/crystal-community/bluetooth/fork )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)
