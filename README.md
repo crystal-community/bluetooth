@@ -57,4 +57,4 @@ Some relevant resources:
 
 ## Contributors
 
-- [bararchy(https://github.com/bararchy) Bar Hofesh - creator, maintainer
+- [bararchy](https://github.com/bararchy) Bar Hofesh - creator, maintainer
