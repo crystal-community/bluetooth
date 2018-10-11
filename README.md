@@ -1,5 +1,7 @@
 # bluetooth
 
+[![Build Status](https://travis-ci.org/crystal-community/bluetooth.svg?branch=master)](https://travis-ci.org/crystal-community/bluetooth)
+
 This project is a **WIP**  
 
 Bluez C binding in Crystal
