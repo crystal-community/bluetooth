@@ -104,48 +104,48 @@ describe Bluetooth do
   #   {
   #     cout << "Error scanning." << endl;
   # }
-  it "scnas for BLE devices" do
-    dev = LibHCI.get_route(nil)
-    puts "Using dev: #{dev}"
-    socket = LibHCI.open_dev(dev)
-    puts "FD: #{socket}"
+  # it "scnas for BLE devices" do
+  #   dev = LibHCI.get_route(nil)
+  #   puts "Using dev: #{dev}"
+  #   socket = LibHCI.open_dev(dev)
+  #   puts "FD: #{socket}"
 
-    # Change to BLE mode
-    LibHCI.le_set_scan_parameters(dev, 0x01, Bluetooth.bswap(0x0010), Bluetooth.bswap(0x0010), 0x00, 0x00, 1000)
-    LibHCI.le_set_scan_enable(dev, 0x01, 1, 1000)
+  #   # Change to BLE mode
+  #   LibHCI.le_set_scan_parameters(dev, 0x01, Bluetooth.bswap(0x0010), Bluetooth.bswap(0x0010), 0x00, 0x00, 1000)
+  #   LibHCI.le_set_scan_enable(dev, 0x01, 1, 1000)
 
-    # Set new filter
-    filter = LibHCI::Filter.new
+  #   # Set new filter
+  #   filter = LibHCI::Filter.new
 
-    LibC.memset(pointerof(filter), 0, sizeof(LibHCI::Filter))
-    puts "after memset"
-    Bluetooth.filter_set_ptype(LibHCI::HCI_EVENT_PKT, pointerof(filter))
-    puts "after filter set"
-    Bluetooth.filter_set_event(LibHCI::EVT_LE_META_EVENT, pointerof(filter))
-    puts "after set event"
-    LibC.setsockopt(socket, LibHCI::SOL_HCI, LibHCI::HCI_FILTER, pointerof(filter), sizeof(LibHCI::Filter))
-    puts "after set socket"
+  #   LibC.memset(pointerof(filter), 0, sizeof(LibHCI::Filter))
+  #   puts "after memset"
+  #   Bluetooth.filter_set_ptype(LibHCI::HCI_EVENT_PKT, pointerof(filter))
+  #   puts "after filter set"
+  #   Bluetooth.filter_set_event(LibHCI::EVT_LE_META_EVENT, pointerof(filter))
+  #   puts "after set event"
+  #   LibC.setsockopt(socket, LibHCI::SOL_HCI, LibHCI::HCI_FILTER, pointerof(filter), sizeof(LibHCI::Filter))
+  #   puts "after set socket"
 
-    # Loop and scan
-    loop do
-      buf = Bytes.new(LibHCI::HCI_MAX_EVENT_SIZE)
-      while (LibC.read(socket, buf, 5) < 0)
-        a = Errno.new("")
-        if a.is_a?(Errno::EINTR) || a.is_a?(Errno::EAGAIN)
-          puts "Try again: #{a}"
-          sleep 2
-          next
-        else
-          raise Bluetooth::RawReadException.new("Error reading from socket: #{a}")
-        end
-      end
-      puts "Got back a response: #{buf}"
-      puts "Stringfy: #{String.new(buf)}"
-      # # evt_le_meta_event *meta = (evt_le_meta_event*)(((uint8_t *)&buf) + (1 + HCI_EVENT_HDR_SIZE));
-      # meta = Pointer(LibHCI::EvtLeMetaEven).new()
-      break
-    end
+  #   # Loop and scan
+  #   loop do
+  #     buf = Bytes.new(LibHCI::HCI_MAX_EVENT_SIZE)
+  #     while (LibC.read(socket, buf, 5) < 0)
+  #       a = Errno.new("")
+  #       if a.is_a?(Errno::EINTR) || a.is_a?(Errno::EAGAIN)
+  #         puts "Try again: #{a}"
+  #         sleep 2
+  #         next
+  #       else
+  #         raise Bluetooth::RawReadException.new("Error reading from socket: #{a}")
+  #       end
+  #     end
+  #     puts "Got back a response: #{buf}"
+  #     puts "Stringfy: #{String.new(buf)}"
+  #     # # evt_le_meta_event *meta = (evt_le_meta_event*)(((uint8_t *)&buf) + (1 + HCI_EVENT_HDR_SIZE));
+  #     # meta = Pointer(LibHCI::EvtLeMetaEven).new()
+  #     break
+  #   end
 
-    LibHCI.close_dev(socket)
-  end
+  #   LibHCI.close_dev(socket)
+  # end
 end
