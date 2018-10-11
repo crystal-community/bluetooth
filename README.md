@@ -1,6 +1,8 @@
 # bluetooth
 
-This project is a try at Bluez C binding with Crystal
+This project is a **WIP**  
+
+Bluez C binding in Crystal
 
 ## Installation
 
